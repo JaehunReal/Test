@@ -48,7 +48,8 @@
   <h2>2. 시사점</h2>
   <div class="note">
     <ul>
-      <li>린트·타입체크·단위테스트·빌드 전 항목 통과 (총 114개 테스트 실패 0건)</li>
+      <li>린트·타입체크·단위테스트·빌드 전 항목 통과 (총 127개 테스트 실패 0건)</li>
+      <li>E2E: 에이전트 Worker·Pages·웹을 로컬 구동해 로그인, 채팅, 할 일, 메모, 기억, 자동화, 설정, 모바일 화면 검증 (AI는 모의 응답)</li>
       <li>Cloudflare 전용 구조(Workers·Pages·Durable Object)로 Vercel에서 앱 자체 구동은 불가</li>
       <li>본 페이지는 테스트 결과를 공유하는 정적 대시보드로 Vercel 배포용으로 구성</li>
     </ul>
@@ -57,7 +58,6 @@
   <h2>3. 향후 계획</h2>
   <div class="note">
     <ul>
-      <li>E2E 테스트(<code>npm run test:e2e</code>, Playwright) 추가 실행</li>
       <li>Cloudflare 계정 배포 후 실서비스 스모크 테스트(<code>npm run test:smoke</code>) 수행</li>
     </ul>
   </div>
@@ -70,13 +70,14 @@
     {name:"에이전트(Worker) 테스트", cmd:"npm run test -w @talorys/agent", pass:65, total:65},
     {name:"웹 프론트엔드 테스트", cmd:"npm run test -w @talorys/web", pass:3, total:3},
     {name:"설치 CLI 테스트", cmd:"npm run test -w create-talorys", pass:32, total:32},
+    {name:"E2E (실제 앱 구동, Playwright)", cmd:"npx playwright test", pass:13, total:13},
     {name:"전체 빌드", cmd:"npm run build", pass:null}
   ];
   const counted = results.filter(r => r.total);
   const pass = counted.reduce((a,r)=>a+r.pass,0), total = counted.reduce((a,r)=>a+r.total,0);
   document.getElementById("cards").innerHTML = [
     [results.length+"/"+results.length, "검증 항목 통과"],
-    [pass+"/"+total, "단위테스트 통과"],
+    [pass+"/"+total, "단위+E2E 테스트 통과"],
     ["0", "실패"],
     ["100%", "통과율"]
   ].map(c=>`<div class="card"><b>${c[0]}</b><span>${c[1]}</span></div>`).join("");
