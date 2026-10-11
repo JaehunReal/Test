@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talorys 테스트 결과</title>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--text:#1c2430;--muted:#6b7686;--ok:#1a7f45;--okbg:#e4f5ea;--line:#e3e7ee;--accent:#1f4e9c}
+  @media (prefers-color-scheme:dark){:root{--bg:#10151c;--card:#182029;--text:#e8edf3;--muted:#98a4b3;--ok:#4cc27d;--okbg:#17332360;--line:#263140;--accent:#7aa7ec}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.6}
+  main{max-width:880px;margin:0 auto;padding:32px 16px 64px}
+  h1{font-size:1.6rem;margin:0 0 4px}
+  h2{font-size:1.1rem;margin:32px 0 12px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.9rem}
+  .sub a{color:var(--accent)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card b{display:block;font-size:1.7rem}
+  .card span{color:var(--muted);font-size:.85rem}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.92rem}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:.8rem}
+  tr:last-child td{border-bottom:0}
+  .badge{display:inline-block;padding:1px 10px;border-radius:99px;background:var(--okbg);color:var(--ok);font-weight:700;font-size:.8rem}
+  .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:80px}
+  .bar i{display:block;height:100%;background:var(--ok)}
+  ul{padding-left:20px;margin:0}
+  li{margin:4px 0}
+  .note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;font-size:.92rem}
+  code{background:var(--line);padding:1px 6px;border-radius:4px;font-size:.85em}
+  @media (max-width:560px){.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Talorys 테스트 결과</h1>
+  <div class="sub">대상: <a href="https://github.com/rociiu/talorys">rociiu/talorys</a> · 커밋 <code>75589a5</code> · 실행일 2026-10-11 · Node v22.22.0</div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>1. 검증 항목별 결과</h2>
+  <table>
+    <thead><tr><th>항목</th><th>명령</th><th class="hide-sm">통과/전체</th><th>결과</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <h2>2. 시사점</h2>
+  <div class="note">
+    <ul>
+      <li>린트·타입체크·단위테스트·빌드 전 항목 통과 (총 114개 테스트 실패 0건)</li>
+      <li>Cloudflare 전용 구조(Workers·Pages·Durable Object)로 Vercel에서 앱 자체 구동은 불가</li>
+      <li>본 페이지는 테스트 결과를 공유하는 정적 대시보드로 Vercel 배포용으로 구성</li>
+    </ul>
+  </div>
+
+  <h2>3. 향후 계획</h2>
+  <div class="note">
+    <ul>
+      <li>E2E 테스트(<code>npm run test:e2e</code>, Playwright) 추가 실행</li>
+      <li>Cloudflare 계정 배포 후 실서비스 스모크 테스트(<code>npm run test:smoke</code>) 수행</li>
+    </ul>
+  </div>
+</main>
+<script>
+  const results = [
+    {name:"린트 (Biome)", cmd:"npm run lint", pass:null},
+    {name:"타입체크 (TypeScript)", cmd:"npm run typecheck", pass:null},
+    {name:"공용 패키지 단위테스트", cmd:"npm run test:shared", pass:14, total:14},
+    {name:"에이전트(Worker) 테스트", cmd:"npm run test -w @talorys/agent", pass:65, total:65},
+    {name:"웹 프론트엔드 테스트", cmd:"npm run test -w @talorys/web", pass:3, total:3},
+    {name:"설치 CLI 테스트", cmd:"npm run test -w create-talorys", pass:32, total:32},
+    {name:"전체 빌드", cmd:"npm run build", pass:null}
+  ];
+  const counted = results.filter(r => r.total);
+  const pass = counted.reduce((a,r)=>a+r.pass,0), total = counted.reduce((a,r)=>a+r.total,0);
+  document.getElementById("cards").innerHTML = [
+    [results.length+"/"+results.length, "검증 항목 통과"],
+    [pass+"/"+total, "단위테스트 통과"],
+    ["0", "실패"],
+    ["100%", "통과율"]
+  ].map(c=>`<div class="card"><b>${c[0]}</b><span>${c[1]}</span></div>`).join("");
+  document.getElementById("rows").innerHTML = results.map(r=>{
+    const cnt = r.total ? `${r.pass}/${r.total}` : "-";
+    return `<tr><td>${r.name}</td><td><code>${r.cmd}</code></td><td class="hide-sm">${cnt}</td><td><span class="badge">통과</span></td></tr>`;
+  }).join("");
+</script>
+</body>
+</html>
